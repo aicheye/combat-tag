@@ -2,20 +2,20 @@ package name.modid;
 
 import name.modid.access.ServerPlayerEntityAccess;
 import name.modid.events.PlayerAttackCallback;
-import name.modid.events.PlayerDamageCallback;
 import name.modid.events.PlayerDeathCallback;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.player.ItemCooldownManager;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
@@ -49,10 +49,11 @@ public class CombatTag implements ModInitializer {
 
 		LOGGER.info("{} successfully loaded", MOD_ID);
 
-		PlayerDamageCallback.EVENT.register(CombatTag::onPlayerDamaged);
 		PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
 		PlayerAttackCallback.EVENT.register(CombatTag::onPlayerAttack);
 		ServerTickEvents.END_SERVER_TICK.register(CombatTag::tickScoreboard);
+
+		LOGGER.info("{} listening on event channels", MOD_ID);
 	}
 
 	private static void setPearlCooldown(ServerPlayerEntity player, int duration, boolean startNow) {
@@ -84,12 +85,6 @@ public class CombatTag implements ModInitializer {
 		setPearlCooldown(player, DEFAULT_TP_COOLDOWN, false);
 	}
 
-	private static void onPlayerDamaged(ServerPlayerEntity player, DamageSource source) {
-		if (!source.getType().msgId().equals("fall")) {
-			combatTag(player);
-		}
-	}
-
 	private static void onPlayerDeath(ServerPlayerEntity player) {
 		removeCombatTag(player);
 		cleanBossBars(Objects.requireNonNull(player.getServer()));
@@ -108,8 +103,10 @@ public class CombatTag implements ModInitializer {
         }
     }
 
-	private static void onPlayerAttack(ServerPlayerEntity player) {
-		combatTag(player);
+	private static void onPlayerAttack(ServerPlayerEntity player, Entity target) {
+		if (target instanceof PlayerEntity) {
+			combatTag(player);
+		}
 	}
 
 	private static void tickScoreboard(MinecraftServer server) {
