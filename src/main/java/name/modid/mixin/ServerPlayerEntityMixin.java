@@ -68,10 +68,9 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         this.combat = combat;
         if (combat) {
             ticksSinceCombat = 0;
-            if (combatBar != null) {
-                combatBar.remove();
+            if (combatBar == null) {
+                combatBar = new CombatBar((ServerPlayerEntity) (Object) this);
             }
-            combatBar = new CombatBar((ServerPlayerEntity) (Object) this);
             combatBar.update(1.0F);
         } else {
             if (combatBar != null) {
@@ -123,7 +122,7 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         if (ci != null) {
             ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
             this.combat_tag$setCombat(false);
-            PlayerDeathCallback.EVENT.invoker().onPlayerDeath(player);
+            PlayerDeathCallback.EVENT.invoker().onPlayerDeath(player, source);
         }
     }
 
