@@ -1,12 +1,15 @@
 package name.modid;
 
 import name.modid.access.ServerPlayerEntityAccess;
+import name.modid.events.PlayerAttackCallback;
 import name.modid.events.PlayerDamageCallback;
 import name.modid.events.PlayerDeathCallback;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
+import net.minecraft.entity.boss.BossBarManager;
+import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
@@ -18,6 +21,8 @@ import net.minecraft.util.Identifier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class CombatTag implements ModInitializer {
 	public static final String MOD_ID = "combat-tag";
@@ -46,6 +51,7 @@ public class CombatTag implements ModInitializer {
 
 		PlayerDamageCallback.EVENT.register(CombatTag::onPlayerDamaged);
 		PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
+		PlayerAttackCallback.EVENT.register(CombatTag::onPlayerAttack);
 		ServerTickEvents.END_SERVER_TICK.register(CombatTag::tickScoreboard);
 	}
 
@@ -86,6 +92,24 @@ public class CombatTag implements ModInitializer {
 
 	private static void onPlayerDeath(ServerPlayerEntity player) {
 		removeCombatTag(player);
+		cleanBossBars(Objects.requireNonNull(player.getServer()));
+	}
+
+	private static void cleanBossBars(MinecraftServer server) {
+		BossBarManager bossBarManager = server.getBossBarManager();
+
+        for (ServerBossBar bar : bossBarManager.getAll()) {
+            if (bar instanceof CombatBar) {
+                if (bar.getPlayers().isEmpty()) {
+                    bar.clearPlayers();
+                    bar.setVisible(false);
+                }
+            }
+        }
+    }
+
+	private static void onPlayerAttack(ServerPlayerEntity player) {
+		combatTag(player);
 	}
 
 	private static void tickScoreboard(MinecraftServer server) {
