@@ -3,7 +3,6 @@ package name.modid.mixin;
 import name.modid.CombatBar;
 import name.modid.access.ServerPlayerEntityAccess;
 import name.modid.events.PlayerAttackCallback;
-import name.modid.events.PlayerDamageCallback;
 
 import name.modid.events.PlayerDeathCallback;
 import net.minecraft.entity.Entity;
@@ -11,15 +10,14 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAccess {
@@ -30,6 +28,9 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     private static final String ENDER_PEARLS_KEY = "PearlCooldown";
     @Unique
     private static final String COMBAT_TAG_TICKS_KEY = "CombatTagTicks";
+
+    @Unique
+    private static final int COMBAT_TICK_RESET = 20 * 20;
     
     @Unique
     private boolean combat = false;
@@ -81,8 +82,9 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
 
     @Inject(method = "onDisconnect", at = @At("HEAD"))
     public void onDisconnect(CallbackInfo ci) {
-        if (combat) {
-            ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+        MinecraftServer server = player.getServer();
+        if (combat && server != null && !server.isStopping() && !server.isSaving() && !server.isPaused()) {
             player.setHealth(1.0F);
             player.setAbsorptionAmount(0.0F);
             StatusEffectInstance poison = new StatusEffectInstance(StatusEffects.POISON, POISON_DURATION);
@@ -92,8 +94,6 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
 
     @Inject(method = "tick", at = @At("RETURN"))
     public void tick(CallbackInfo ci) {
-        final int COMBAT_TICK_RESET = 20 * 60;
-
         if (combat) {
             ticksSinceCombat++;
             if (ticksSinceCombat >= COMBAT_TICK_RESET) {
@@ -114,19 +114,7 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     private void onAttack(Entity target, CallbackInfo ci) {
         if (ci != null) {
             ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-            PlayerAttackCallback.EVENT.invoker().onPlayerAttack(player);
-        }
-    }
-
-    @Inject(method = "damage", at = @At("RETURN"))
-    private void onDamage(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
-        if (cir.getReturnValue()) {
-            ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-            PlayerDamageCallback.EVENT.invoker().onPlayerDamaged(player, source);
-
-            if (player.getHealth() - amount <= 0.0F) {
-                this.combat_tag$setCombat(false);
-            }
+            PlayerAttackCallback.EVENT.invoker().onPlayerAttack(player, target);
         }
     }
 
