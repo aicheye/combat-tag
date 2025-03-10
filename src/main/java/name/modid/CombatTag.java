@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.boss.ServerBossBar;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Scoreboard;
@@ -85,9 +86,19 @@ public class CombatTag implements ModInitializer {
 		setPearlCooldown(player, DEFAULT_TP_COOLDOWN, false);
 	}
 
-	private static void onPlayerDeath(ServerPlayerEntity player) {
+	private static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
 		removeCombatTag(player);
 		cleanBossBars(Objects.requireNonNull(player.getServer()));
+
+		if (source.getAttacker() instanceof ServerPlayerEntity attacker) {
+			combatTag(attacker);
+			if (combatTeam != null && scoreboard != null) {
+				if (!combatTeam.getPlayerList().contains(attacker.getNameForScoreboard())) {
+					combatTeam.getPlayerList().add(attacker.getNameForScoreboard());
+				}
+				scoreboard.updateScoreboardTeamAndPlayers(combatTeam);
+			}
+		}
 	}
 
 	private static void cleanBossBars(MinecraftServer server) {
@@ -106,6 +117,7 @@ public class CombatTag implements ModInitializer {
 	private static void onPlayerAttack(ServerPlayerEntity player, Entity target) {
 		if (target instanceof PlayerEntity) {
 			combatTag(player);
+			combatTag((ServerPlayerEntity) target);
 		}
 	}
 
@@ -125,13 +137,13 @@ public class CombatTag implements ModInitializer {
 		for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 			ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
 
-			if (combatAccessor.combat_tag$inCombat() && !combatTeam.getPlayerList().contains(player.getName().getString())) {
+			if (combatAccessor.combat_tag$inCombat() && !combatTeam.getPlayerList().contains(player.getNameForScoreboard())) {
 				LOGGER.info("Added combat tag to {}", player.getName().getString());
 				combatTeam.getPlayerList().add(player.getNameForScoreboard());
 				scoreboard.updateScoreboardTeamAndPlayers(combatTeam);
 			}
 
-			else if (!combatAccessor.combat_tag$inCombat() && combatTeam.getPlayerList().contains(player.getName().getString())) {
+			else if (!combatAccessor.combat_tag$inCombat() && combatTeam.getPlayerList().contains(player.getNameForScoreboard())) {
 				LOGGER.info("Removed combat tag from {}", player.getName().getString());
 				combatTeam.getPlayerList().remove(player.getNameForScoreboard());
 				scoreboard.updateRemovedTeam(combatTeam);
