@@ -3,6 +3,7 @@ package name.modid.mixin;
 import name.modid.access.ServerPlayerEntityAccess;
 import name.modid.events.PlayerDamageCallback;
 
+import name.modid.events.PlayerDeathCallback;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,22 +21,40 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     @Unique
     private static final String COMBAT_TAG_KEY = "CombatTag";
     @Unique
+    private static final String ENDER_PEARLS_KEY = "PearlCooldown";
+    @Unique
     private static final String COMBAT_TAG_TICKS_KEY = "CombatTagTicks";
+    
     @Unique
     private boolean combat = false;
     @Unique
     private int ticksSinceCombat = 0;
+    
+    @Unique
+    private static final int DEFAULT_PEARL_COOLDOWN = 20;
+    @Unique
+    private int pearlCooldown = DEFAULT_PEARL_COOLDOWN;
+    
+    @Unique
+    public int combat_tag$getPearlCooldown() {
+        return pearlCooldown;
+    }
+    
+    @Unique
+    public void combat_tag$setPearlCooldown(int duration) {
+        pearlCooldown = duration;
+    }
 
     @Unique
     public boolean combat_tag$inCombat() {
-        return this.combat;
+        return combat;
     }
 
     @Unique
     public void combat_tag$setCombat(boolean combat) {
         this.combat = combat;
         if (combat) {
-            this.ticksSinceCombat = 0;
+            ticksSinceCombat = 0;
         }
     }
 
@@ -43,18 +62,14 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     public void tick(CallbackInfo ci) {
         final int COMBAT_TICK_RESET = 20 * 60;
 
-        if (this.combat) {
-            this.ticksSinceCombat++;
-            if (this.ticksSinceCombat >= COMBAT_TICK_RESET) {
-                this.combat = false;
-                this.ticksSinceCombat = 0;
+        if (combat) {
+            ticksSinceCombat++;
+            if (ticksSinceCombat >= COMBAT_TICK_RESET) {
+                combat = false;
+                ticksSinceCombat = 0;
+                pearlCooldown = DEFAULT_PEARL_COOLDOWN;
             }
         }
-    }
-
-    @Unique
-    public int combat_tag$getTicksSinceCombat() {
-        return ticksSinceCombat;
     }
 
     @Inject(method = "damage", at = @At("RETURN"))
@@ -65,26 +80,39 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         }
     }
 
+    @Inject(method = "onDeath", at = @At("RETURN"))
+    private void onDeath(DamageSource source, CallbackInfo ci) {
+        if (ci != null) {
+            ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+            PlayerDeathCallback.EVENT.invoker().onPlayerDeath(player);
+        }
+    }
+
     @Inject(method = "writeCustomDataToNbt", at = @At("HEAD"))
     private void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
-        nbt.putBoolean(COMBAT_TAG_KEY, this.combat);
-        nbt.putInt(COMBAT_TAG_TICKS_KEY, this.ticksSinceCombat);
+        nbt.putBoolean(COMBAT_TAG_KEY, combat);
+        nbt.putInt(COMBAT_TAG_TICKS_KEY, ticksSinceCombat);
+        nbt.putInt(ENDER_PEARLS_KEY, pearlCooldown);
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
     private void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains(COMBAT_TAG_KEY)) {
-            this.combat = nbt.getBoolean(COMBAT_TAG_KEY);
+            combat = nbt.getBoolean(COMBAT_TAG_KEY);
         }
         else {
-            this.combat = false;
-            this.ticksSinceCombat = 0;
+            combat = false;
+            ticksSinceCombat = 0;
+        }
+        
+        if (nbt.contains(ENDER_PEARLS_KEY)) {
+            pearlCooldown = nbt.getInt(ENDER_PEARLS_KEY);
         }
 
         if (nbt.contains(COMBAT_TAG_TICKS_KEY)) {
-            this.ticksSinceCombat = nbt.getInt(COMBAT_TAG_TICKS_KEY);
+            ticksSinceCombat = nbt.getInt(COMBAT_TAG_TICKS_KEY);
         } else {
-            this.ticksSinceCombat = 0;
+            ticksSinceCombat = 0;
         }
     }
 }
