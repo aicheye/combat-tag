@@ -3,13 +3,13 @@
 	"id": "combat-tag",
 	"version": "${version}",
 	"name": "Combat Tag",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Adds a 1 minute combat tag",
 	"authors": [
-		"Me!"
+		"Sean Yang"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/aicheye/combat-tag"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/combat-tag/icon.png",
