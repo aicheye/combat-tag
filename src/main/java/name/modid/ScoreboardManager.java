@@ -1,6 +1,7 @@
 package name.modid;
 
 import name.modid.access.ServerPlayerEntityAccess;
+
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;

@@ -3,9 +3,9 @@ package name.modid.mixin;
 import name.modid.CombatTag;
 import name.modid.Config;
 import name.modid.access.ServerPlayerEntityAccess;
-
 import name.modid.events.PlayerDamageCallback;
 import name.modid.events.PlayerDeathCallback;
+
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;

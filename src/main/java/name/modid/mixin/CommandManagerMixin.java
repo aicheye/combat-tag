@@ -1,12 +1,14 @@
 package name.modid.mixin;
 
-import com.mojang.brigadier.CommandDispatcher;
 import name.modid.Config;
+
+import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.command.TeamCommand;
 import net.minecraft.server.command.TeamMsgCommand;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;

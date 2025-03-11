@@ -6,7 +6,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-
 public class CombatBar extends ServerBossBar {
     ServerPlayerEntity owner;
 
