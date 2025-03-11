@@ -2,6 +2,7 @@ package name.modid.mixin;
 
 import name.modid.Config;
 import name.modid.access.ServerPlayerEntityAccess;
+
 import net.minecraft.component.type.UseCooldownComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;

@@ -1,6 +1,7 @@
 package name.modid;
 
 import name.modid.access.ServerPlayerEntityAccess;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
