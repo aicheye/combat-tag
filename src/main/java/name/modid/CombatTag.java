@@ -57,13 +57,15 @@ public class CombatTag implements ModInitializer {
 		if (Config.ENABLE_INSTANT_TP_PUNISH) {
 			setPearlCooldown(player);
 		}
-		LOGGER.info("Combat tagged {}", player.getName());
+		if (!combatAccessor.combat_tag$inCombat()) {
+			LOGGER.info("Combat tagged {}", player.getName().toString());
+		}
 	}
 
 	private static void removeCombatTag(ServerPlayerEntity player) {
 		ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
 		combatAccessor.combat_tag$setCombat(false);
-		LOGGER.info("Removed combat tag from {}", player.getName());
+		LOGGER.info("Removed combat tag from {}", player.getName().toString());
 	}
 
 	private static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
@@ -71,11 +73,11 @@ public class CombatTag implements ModInitializer {
 	}
 
 	private static void onPlayerDamage(ServerPlayerEntity player, DamageSource source) {
-		if (source.getAttacker() instanceof ServerPlayerEntity attacker) {
+		if (source.getAttacker() instanceof ServerPlayerEntity attacker && attacker != player) {
             combatTag(player);
 			combatTag(attacker);
 		} else if (source.getAttacker() instanceof ProjectileEntity projectile) {
-			if (projectile.getOwner() instanceof ServerPlayerEntity owner) {
+			if (projectile.getOwner() instanceof ServerPlayerEntity owner && owner != player) {
 				combatTag(player);
 				combatTag(owner);
 			}
