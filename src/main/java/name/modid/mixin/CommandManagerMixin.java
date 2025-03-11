@@ -1,9 +1,12 @@
 package name.modid.mixin;
 
 import com.mojang.brigadier.CommandDispatcher;
+import name.modid.Config;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.command.TeamCommand;
+import net.minecraft.server.command.TeamMsgCommand;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -19,7 +22,9 @@ public class CommandManagerMixin {
             )
     )
     private void registerTeamMsg(CommandDispatcher<ServerCommandSource> dispatcher) {
-        // Do nothing
+        if (!Config.DISABLE_TEAM_MSG_COMMAND) {
+            TeamMsgCommand.register(dispatcher);
+        }
     }
 
     @Redirect(
@@ -30,6 +35,8 @@ public class CommandManagerMixin {
             )
     )
     private void registerTeam(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        // Do nothing
+        if (!Config.DISABLE_TEAM_COMMAND) {
+            TeamCommand.register(dispatcher, registryAccess);
+        }
     }
 }
