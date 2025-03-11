@@ -1,14 +1,13 @@
 package name.modid.mixin;
 
 import name.modid.CombatBar;
+import name.modid.CombatTag;
 import name.modid.access.ServerPlayerEntityAccess;
 import name.modid.events.PlayerAttackCallback;
 
 import name.modid.events.PlayerDeathCallback;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -44,9 +43,6 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
 
     @Unique
     private CombatBar combatBar;
-
-    @Unique
-    private static final int POISON_DURATION = 20 * 20;
     
     @Unique
     public int combat_tag$getPearlCooldown() {
@@ -84,10 +80,7 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         MinecraftServer server = player.getServer();
         if (combat && server != null && !server.isStopping() && !server.isSaving() && !server.isPaused()) {
-            player.setHealth(1.0F);
-            player.setAbsorptionAmount(0.0F);
-            StatusEffectInstance poison = new StatusEffectInstance(StatusEffects.POISON, POISON_DURATION);
-            player.setStatusEffect(poison, null);
+            CombatTag.logoutPunish(player);
         }
     }
 

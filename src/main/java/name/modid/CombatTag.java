@@ -11,6 +11,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.boss.BossBarManager;
 import net.minecraft.entity.boss.ServerBossBar;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Scoreboard;
@@ -36,6 +38,9 @@ public class CombatTag implements ModInitializer {
 	private static final String CHORUS_FRUIT = "minecraft:chorus_fruit";
 	private static final int DEFAULT_TP_COOLDOWN = 20;
 	private static final int COMBAT_TP_COOLDOWN = 20 * 20;
+
+	private static final int POISON_DURATION = 20 * 20;
+	private static final int POISON_AMPLIFIER = 5;
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -119,6 +124,13 @@ public class CombatTag implements ModInitializer {
 			combatTag(player);
 			combatTag((ServerPlayerEntity) target);
 		}
+	}
+
+	public static void logoutPunish(ServerPlayerEntity player) {
+		player.setHealth(1.0F);
+		player.setAbsorptionAmount(0.0F);
+		StatusEffectInstance poison = new StatusEffectInstance(StatusEffects.POISON, POISON_DURATION, POISON_AMPLIFIER);
+		player.addStatusEffect(poison);
 	}
 
 	private static void tickScoreboard(MinecraftServer server) {
