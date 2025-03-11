@@ -3,11 +3,9 @@ package name.modid.mixin;
 import name.modid.CombatTag;
 import name.modid.Config;
 import name.modid.access.ServerPlayerEntityAccess;
-import name.modid.events.PlayerAttackCallback;
 
 import name.modid.events.PlayerDamageCallback;
 import name.modid.events.PlayerDeathCallback;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -72,12 +70,6 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         }
     }
 
-    @Inject(method = "attack", at = @At("RETURN"))
-    private void onAttack(Entity target, CallbackInfo ci) {
-        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        PlayerAttackCallback.EVENT.invoker().onPlayerAttack(player, target);
-    }
-
     @Inject(method = "damage", at = @At("RETURN"))
     private void onDamage(ServerWorld world, DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
@@ -87,7 +79,6 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     @Inject(method = "onDeath", at = @At("HEAD"))
     private void onDeath(DamageSource source, CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        this.combat_tag$setCombat(false);
         PlayerDeathCallback.EVENT.invoker().onPlayerDeath(player, source);
     }
 
