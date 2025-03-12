@@ -38,11 +38,19 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     }
 
     @Unique
-    public void combat_tag$setCombat(boolean combat) {
-        this.combat = combat;
-        if (combat) {
-            ticksSinceCombat = 0;
+    public String combat_tag$setCombat(boolean combat) {
+        String log = null;
+
+        if (combat && !this.combat_tag$inCombat()) {
+            log = "added combat tag to " + ((ServerPlayerEntity) (Object) this).getName().toString();
+        } else if (!combat && this.combat_tag$inCombat()) {
+            log = " removed combat tag from " + ((ServerPlayerEntity) (Object) this).getName().toString();
         }
+
+        this.combat = combat;
+        ticksSinceCombat = 0;
+
+        return log;
     }
 
     @Unique
@@ -92,8 +100,7 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     private void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains(COMBAT_TAG_KEY)) {
             combat = nbt.getBoolean(COMBAT_TAG_KEY);
-        }
-        else {
+        } else {
             combat = false;
         }
 
