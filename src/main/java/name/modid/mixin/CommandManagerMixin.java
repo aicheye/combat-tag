@@ -20,12 +20,12 @@ public class CommandManagerMixin {
             method = "<init>",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/command/TeamMsgCommand;register(Lcom/mojang/brigadier/CommandDispatcher;)V"
+                    target = "Lnet/minecraft/server/command/TeamCommand;register(Lcom/mojang/brigadier/CommandDispatcher;Lnet/minecraft/command/CommandRegistryAccess;)V"
             )
     )
-    private void registerTeamMsg(CommandDispatcher<ServerCommandSource> dispatcher) {
-        if (!Config.DISABLE_TEAM_MSG_COMMAND) {
-            TeamMsgCommand.register(dispatcher);
+    private void registerTeam(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
+        if (!Config.ENABLE_COMBAT_COLOUR || !Config.DISABLE_TEAM_COMMAND) {
+            TeamCommand.register(dispatcher, registryAccess);
         }
     }
 
@@ -33,12 +33,12 @@ public class CommandManagerMixin {
             method = "<init>",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/server/command/TeamCommand;register(Lcom/mojang/brigadier/CommandDispatcher;Lnet/minecraft/command/CommandRegistryAccess;)V"
+                    target = "Lnet/minecraft/server/command/TeamMsgCommand;register(Lcom/mojang/brigadier/CommandDispatcher;)V"
             )
     )
-    private void registerTeam(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
-        if (!Config.DISABLE_TEAM_COMMAND) {
-            TeamCommand.register(dispatcher, registryAccess);
+    private void registerTeamMsg(CommandDispatcher<ServerCommandSource> dispatcher) {
+        if (!Config.ENABLE_COMBAT_COLOUR || !Config.DISABLE_TEAM_MSG_COMMAND) {
+            TeamMsgCommand.register(dispatcher);
         }
     }
 }
