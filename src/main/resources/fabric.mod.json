@@ -3,12 +3,12 @@
 	"id": "combat-tag",
 	"version": "${version}",
 	"name": "Combat Tag",
-	"description": "Adds a 1 minute combat tag",
+	"description": "Lightweight fabric server plugin to make PvP fairer and prevent combat-logging.",
 	"authors": [
 		"Sean Yang"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
+		"homepage": "https://github.com/aicheye/combat-tag",
 		"sources": "https://github.com/aicheye/combat-tag"
 	},
 	"license": "CC0-1.0",
@@ -17,17 +17,10 @@
 	"entrypoints": {
 		"main": [
 			"name.modid.CombatTag"
-		],
-		"client": [
-			"name.modid.CombatTagClient"
 		]
 	},
 	"mixins": [
-		"combat-tag.mixins.json",
-		{
-			"config": "combat-tag.client.mixins.json",
-			"environment": "client"
-		}
+		"combat-tag.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.16.10",
