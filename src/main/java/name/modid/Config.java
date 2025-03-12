@@ -3,8 +3,12 @@ package name.modid;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class Config {
@@ -21,6 +25,7 @@ public class Config {
     public static boolean ENABLE_POISON_PUNISH = true;
     public static boolean ENABLE_INSTANT_TP_PUNISH = true;
     public static boolean ENABLE_TP_PUNISH = true;
+    public static boolean ENABLE_COMBAT_COLOUR = true;
     public static boolean DISABLE_TEAM_MSG_COMMAND = true;
     public static boolean DISABLE_TEAM_COMMAND = true;
 
@@ -30,18 +35,16 @@ public class Config {
     public static int POISON_AMPLIFIER = POISON_LEVEL - 1;
 
     public static void load() throws IOException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
         if (CONFIG_PATH.toFile().exists()) {
-            parse(gson);
+            parse();
         } else {
             throw new IOException();
         }
     }
 
-    public static void generate() throws IOException {
+    public static void write() throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH.toString()));
+        JsonWriter jw = new JsonWriter(new FileWriter(CONFIG_PATH.toString()));
         JsonObject configObj = new JsonObject();
 
         configObj.addProperty("CombatDurationSec", COMBAT_DURATION_SEC);
@@ -55,34 +58,42 @@ public class Config {
         configObj.addProperty("EnablePoisonPunish", ENABLE_POISON_PUNISH);
         configObj.addProperty("EnableInstantTPPunish", ENABLE_INSTANT_TP_PUNISH);
         configObj.addProperty("EnableTPPunish", ENABLE_TP_PUNISH);
+        configObj.addProperty("EnableCombatColour", ENABLE_COMBAT_COLOUR);
         configObj.addProperty("DisableTeamMsgCommand", DISABLE_TEAM_MSG_COMMAND);
         configObj.addProperty("DisableTeamCommand", DISABLE_TEAM_COMMAND);
 
-        gson.toJson(configObj, bw);
-        bw.close();
+        gson.toJson(configObj, jw);
+        jw.close();
     }
 
-    private static void parse(Gson gson) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(CONFIG_PATH.toString()));
-        JsonObject configObj = gson.fromJson(br, JsonObject.class);
+    private static void parse() throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        JsonReader jr = new JsonReader(new FileReader(CONFIG_PATH.toString()));
+        JsonObject configObj = gson.fromJson(jr, JsonObject.class);
 
         if (configObj.get("CombatDurationSec") != null) {
             COMBAT_DURATION_SEC = configObj.get("CombatDurationSec").getAsFloat();
+            COMBAT_DURATION_SEC = Math.max(COMBAT_DURATION_SEC, 0.0F);
         }
         if (configObj.get("CombatTPCooldownSec") != null) {
             COMBAT_TP_COOLDOWN_SEC = configObj.get("CombatTPCooldownSec").getAsFloat();
+            COMBAT_TP_COOLDOWN_SEC = Math.max(COMBAT_TP_COOLDOWN_SEC, 0.0F);
         }
         if (configObj.get("HealthRemainingPunish") != null) {
             HEALTH_REMAINING_PUNISH = configObj.get("HealthRemainingPunish").getAsFloat();
+            HEALTH_REMAINING_PUNISH = Math.max(HEALTH_REMAINING_PUNISH, 0.0F);
         }
         if (configObj.get("AbsorptionRemainingPunish") != null) {
             ABSORPTION_REMAINING_PUNISH = configObj.get("AbsorptionRemainingPunish").getAsFloat();
+            ABSORPTION_REMAINING_PUNISH = Math.max(ABSORPTION_REMAINING_PUNISH, 0.0F);
         }
         if (configObj.get("PoisonDurationSec") != null) {
             POISON_DURATION_SEC = configObj.get("PoisonDurationSec").getAsFloat();
+            POISON_DURATION_SEC = Math.max(POISON_DURATION_SEC, 0.0F);
         }
         if (configObj.get("PoisonLevel") != null) {
             POISON_LEVEL = configObj.get("PoisonLevel").getAsInt();
+            POISON_LEVEL = Math.max(POISON_LEVEL, 0);
         }
         if (configObj.get("EnableHealthPunish") != null) {
             ENABLE_HEALTH_PUNISH = configObj.get("EnableHealthPunish").getAsBoolean();
@@ -99,6 +110,9 @@ public class Config {
         if (configObj.get("EnableTPPunish") != null) {
             ENABLE_TP_PUNISH = configObj.get("EnableTPPunish").getAsBoolean();
         }
+        if (configObj.get("EnableCombatColour") != null) {
+            ENABLE_COMBAT_COLOUR = configObj.get("EnableCombatColour").getAsBoolean();
+        }
         if (configObj.get("DisableTeamMsgCommand") != null) {
             DISABLE_TEAM_MSG_COMMAND = configObj.get("DisableTeamMsgCommand").getAsBoolean();
         }
@@ -106,6 +120,7 @@ public class Config {
             DISABLE_TEAM_COMMAND = configObj.get("DisableTeamCommand").getAsBoolean();
         }
 
-        br.close();
+        jr.close();
+        write();
     }
 }

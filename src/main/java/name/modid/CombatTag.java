@@ -45,16 +45,18 @@ public class CombatTag implements ModInitializer {
 		} catch (IOException e1) {
             LOGGER.info("[{}] generating new config file...", MOD_ID);
 			try {
-				Config.generate();
+				Config.write();
 			} catch (IOException e2) {
-				LOGGER.error("[{}] could not generate new config file... {}", MOD_ID, e2.getMessage());
+				LOGGER.error("[{}] could not write new config file... {}", MOD_ID, e2.getMessage());
 			}
         }
 
         PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
 		PlayerDamageCallback.EVENT.register(CombatTag::onPlayerDamage);
 
-		ServerTickEvents.END_SERVER_TICK.register(ScoreboardManager::tickScoreboard);
+		if (Config.ENABLE_COMBAT_COLOUR) {
+			ServerTickEvents.END_SERVER_TICK.register(ScoreboardManager::tickScoreboard);
+		}
 		ServerTickEvents.END_SERVER_TICK.register(CombatBarManager::tickCombatBars);
 
 		LOGGER.info("[{}] listening on event channels", MOD_ID);
