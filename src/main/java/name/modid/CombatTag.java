@@ -18,6 +18,8 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 public class CombatTag implements ModInitializer {
 	public static final String MOD_ID = "combat-tag";
 
@@ -35,14 +37,27 @@ public class CombatTag implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("{} successfully loaded", MOD_ID);
+		LOGGER.info("[{}] loading config...", MOD_ID);
 
-		PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
+		try {
+			Config.load();
+			LOGGER.info("[{}] config loaded", MOD_ID);
+		} catch (IOException e1) {
+            LOGGER.info("[{}] generating new config file...", MOD_ID);
+			try {
+				Config.generate();
+			} catch (IOException e2) {
+				LOGGER.error("[{}] could not generate new config file... {}", MOD_ID, e2.getMessage());
+			}
+        }
+
+        PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
 		PlayerDamageCallback.EVENT.register(CombatTag::onPlayerDamage);
+
 		ServerTickEvents.END_SERVER_TICK.register(ScoreboardManager::tickScoreboard);
 		ServerTickEvents.END_SERVER_TICK.register(CombatBarManager::tickCombatBars);
 
-		LOGGER.info("{} listening on event channels", MOD_ID);
+		LOGGER.info("[{}] listening on event channels", MOD_ID);
 	}
 
 	private static void setPearlCooldown(ServerPlayerEntity player) {
@@ -53,19 +68,20 @@ public class CombatTag implements ModInitializer {
 
 	private static void combatTag(ServerPlayerEntity player) {
 		ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
-		combatAccessor.combat_tag$setCombat(true);
+		String log = combatAccessor.combat_tag$setCombat(true);
+
 		if (Config.ENABLE_INSTANT_TP_PUNISH) {
 			setPearlCooldown(player);
 		}
-		if (!combatAccessor.combat_tag$inCombat()) {
-			LOGGER.info("Combat tagged {}", player.getName().toString());
+
+		if (log != null) {
+			LOGGER.info(log);
 		}
 	}
 
 	private static void removeCombatTag(ServerPlayerEntity player) {
 		ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
 		combatAccessor.combat_tag$setCombat(false);
-		LOGGER.info("Removed combat tag from {}", player.getName().toString());
 	}
 
 	private static void onPlayerDeath(ServerPlayerEntity player, DamageSource source) {
@@ -73,23 +89,28 @@ public class CombatTag implements ModInitializer {
 	}
 
 	private static void onPlayerDamage(ServerPlayerEntity player, DamageSource source) {
-		if (source.getAttacker() instanceof ServerPlayerEntity attacker && attacker != player) {
-            combatTag(player);
-			combatTag(attacker);
+		ServerPlayerEntity attacker = player;
+
+		if (source.getAttacker() instanceof ServerPlayerEntity) {
+            attacker = (ServerPlayerEntity) source.getAttacker();
 		} else if (source.getAttacker() instanceof ProjectileEntity projectile) {
-			if (projectile.getOwner() instanceof ServerPlayerEntity owner && owner != player) {
-				combatTag(player);
-				combatTag(owner);
-			}
+			if (projectile.getOwner() instanceof ServerPlayerEntity) {
+				attacker = (ServerPlayerEntity) projectile.getOwner();
+ 			}
+		}
+
+		if (!attacker.equals(player)) {
+			combatTag(player);
+			combatTag(attacker);
 		}
 	}
 
 	public static void logoutPunish(ServerPlayerEntity player) {
-		if (Config.ENABLE_DAMAGE_PUNISH) {
-			player.setHealth(Config.HEALTH_REMAINING);
+		if (Config.ENABLE_HEALTH_PUNISH) {
+			player.setHealth(Config.HEALTH_REMAINING_PUNISH);
 		}
 		if (Config.ENABLE_ABSORPTION_PUNISH) {
-			player.setAbsorptionAmount(Config.ABSORPTION_REMAINING);
+			player.setAbsorptionAmount(Config.ABSORPTION_REMAINING_PUNISH);
 		}
 		if (Config.ENABLE_POISON_PUNISH) {
 			StatusEffectInstance poison = new StatusEffectInstance(
