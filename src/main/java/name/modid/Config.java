@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class Config {
 
     public static void write() throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JsonWriter jw = new JsonWriter(new FileWriter(CONFIG_PATH.toString()));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH.toString()));
         JsonObject configObj = new JsonObject();
 
         configObj.addProperty("CombatDurationSec", COMBAT_DURATION_SEC);
@@ -62,8 +62,8 @@ public class Config {
         configObj.addProperty("DisableTeamMsgCommand", DISABLE_TEAM_MSG_COMMAND);
         configObj.addProperty("DisableTeamCommand", DISABLE_TEAM_COMMAND);
 
-        gson.toJson(configObj, jw);
-        jw.close();
+        gson.toJson(configObj, bw);
+        bw.close();
     }
 
     private static void parse() throws IOException {
