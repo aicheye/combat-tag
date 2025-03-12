@@ -43,11 +43,13 @@ public class CombatTag implements ModInitializer {
 			Config.load();
 			LOGGER.info("[{}] config loaded", MOD_ID);
 		} catch (IOException e1) {
-            LOGGER.info("[{}] generating new config file...", MOD_ID);
+			LOGGER.info("[{}] could not load config", MOD_ID);
 			try {
+				LOGGER.info("[{}] generating new config file...", MOD_ID);
 				Config.write();
+				LOGGER.info("[{}] config generated successfully", MOD_ID);
 			} catch (IOException e2) {
-				LOGGER.error("[{}] could not write new config file... {}", MOD_ID, e2.getMessage());
+				LOGGER.error("[{}] could not write new config file {}", MOD_ID, e2.getMessage());
 			}
         }
 
@@ -70,19 +72,25 @@ public class CombatTag implements ModInitializer {
 
 	private static void combatTag(ServerPlayerEntity player) {
 		ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
-		String log = combatAccessor.combat_tag$setCombat(true);
+
+		if (!combatAccessor.combat_tag$inCombat()) {
+			LOGGER.info("[{}] combat tagged {}", MOD_ID, player.getName().getString());
+		}
+
+		combatAccessor.combat_tag$setCombat(true);
 
 		if (Config.ENABLE_INSTANT_TP_PUNISH) {
 			setPearlCooldown(player);
 		}
-
-		if (log != null) {
-			LOGGER.info(log);
-		}
 	}
 
-	private static void removeCombatTag(ServerPlayerEntity player) {
+	public static void removeCombatTag(ServerPlayerEntity player) {
 		ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
+
+		if (combatAccessor.combat_tag$inCombat()) {
+			LOGGER.info("[{}] removed combat tag from {}", MOD_ID, player.getName().getString());
+		}
+
 		combatAccessor.combat_tag$setCombat(false);
 	}
 
