@@ -1,7 +1,6 @@
-Lightweight fabric server plugin to make PvP fairer and prevent combat-logging.
+Lightweight fabric server plugin to make PvP fairer and prevent combat-logging. Download on [Modrinth](https://modrinth.com/mod/aicheyes-combat-tag)!
 
 ![image](https://github.com/user-attachments/assets/30e4fe6e-58d0-4fb9-89a9-b41005c27fb0)
-
 
 ## Features:
 - Combat disconnect punishing
