@@ -2,6 +2,7 @@ package name.modid.mixin;
 
 import name.modid.CombatTag;
 import name.modid.Config;
+import name.modid.CombatCooldownManager;
 import name.modid.access.ServerPlayerEntityAccess;
 import name.modid.events.PlayerDamageCallback;
 import name.modid.events.PlayerDeathCallback;
@@ -73,10 +74,18 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         PlayerDamageCallback.EVENT.invoker().onPlayerDamaged(player, source);
     }
 
-    @Inject(method = "onDeath", at = @At("HEAD"))
+    @Inject(method = "onDeath", at = @At("RETURN"))
     private void onDeath(DamageSource source, CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         PlayerDeathCallback.EVENT.invoker().onPlayerDeath(player, source);
+    }
+
+    @Inject(method = "consumeItem", at = @At("RETURN"))
+    private void consumeItem(CallbackInfo ci) {
+        if (combat) {
+            ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+            CombatCooldownManager.consumeCooldowns(player);
+        }
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("HEAD"))

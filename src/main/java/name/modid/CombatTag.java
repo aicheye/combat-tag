@@ -10,10 +10,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.ItemCooldownManager;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +20,6 @@ import java.io.IOException;
 
 public class CombatTag implements ModInitializer {
 	public static final String MOD_ID = "combat-tag";
-
-	private static final String ENDER_PEARL = "minecraft:ender_pearl";
-	private static final String CHORUS_FRUIT = "minecraft:chorus_fruit";
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -64,12 +59,6 @@ public class CombatTag implements ModInitializer {
 		LOGGER.info("[{}] listening on event channels", MOD_ID);
 	}
 
-	private static void setPearlCooldown(ServerPlayerEntity player) {
-		ItemCooldownManager ItemCDM = player.getItemCooldownManager();
-		ItemCDM.set(Identifier.of(ENDER_PEARL), Config.COMBAT_TP_COOLDOWN);
-		ItemCDM.set(Identifier.of(CHORUS_FRUIT), Config.COMBAT_TP_COOLDOWN);
-	}
-
 	private static void combatTag(ServerPlayerEntity player) {
 		ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
 
@@ -80,7 +69,11 @@ public class CombatTag implements ModInitializer {
 		combatAccessor.combat_tag$setCombat(true);
 
 		if (Config.ENABLE_INSTANT_TP_PUNISH) {
-			setPearlCooldown(player);
+			CombatCooldownManager.tagCooldowns(player);
+		}
+
+		if (Config.ENABLE_ELYTRA_PUNISH) {
+			player.stopGliding();
 		}
 	}
 
@@ -108,6 +101,8 @@ public class CombatTag implements ModInitializer {
 				attacker = (ServerPlayerEntity) projectile.getOwner();
  			}
 		}
+
+		combatTag(player);
 
 		if (!attacker.equals(player)) {
 			combatTag(player);

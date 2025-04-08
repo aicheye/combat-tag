@@ -19,26 +19,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class UseCooldownComponentMixin {
 
     @Unique
-    private static final int COMBAT_TP_COOLDOWN = Config.COMBAT_TP_COOLDOWN;
-
-    @Unique
     private boolean inCombat(ServerPlayerEntity player) {
         ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
         return combatAccessor.combat_tag$inCombat();
-    }
-
-    @Unique
-    private void combatTpCooldown(ServerPlayerEntity player, ItemStack stack) {
-        if (stack.getItem().equals(Items.ENDER_PEARL) || stack.getItem().equals(Items.CHORUS_FRUIT)) {
-            player.getItemCooldownManager().set(stack, COMBAT_TP_COOLDOWN);
-        }
     }
 
     @Inject(method = "set", at = @At("RETURN"))
     public void set(ItemStack stack, LivingEntity user, CallbackInfo ci) {
         if (Config.ENABLE_TP_PUNISH) {
             if (user instanceof ServerPlayerEntity player && inCombat(player)) {
-                combatTpCooldown(player, stack);
+                if (stack.getItem().equals(Items.ENDER_PEARL)) {
+                    player.getItemCooldownManager().set(stack, Config.COMBAT_TP_COOLDOWN);
+                }
             }
         }
     }
