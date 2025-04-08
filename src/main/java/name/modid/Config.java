@@ -64,7 +64,7 @@ public class Config {
         JsonObject configObj = new JsonObject();
 
         configObj.addProperty("CombatDurationSec", COMBAT_DURATION_SEC);
-        configObj.addProperty("CombatTPCooldownSec", COMBAT_TP_COOLDOWN_SEC);
+        configObj.addProperty("CombatTpCooldownSec", COMBAT_TP_COOLDOWN_SEC);
         configObj.addProperty("CombatNotchAppleCooldownSec", COMBAT_NOTCH_APPLE_COOLDOWN_SEC);
         configObj.addProperty("HealthRemainingPunish", HEALTH_REMAINING_PUNISH);
         configObj.addProperty("AbsorptionRemainingPunish", ABSORPTION_REMAINING_PUNISH);
@@ -95,8 +95,8 @@ public class Config {
             COMBAT_DURATION_SEC = configObj.get("CombatDurationSec").getAsFloat();
             COMBAT_DURATION_SEC = Math.max(COMBAT_DURATION_SEC, 0.0F);
         }
-        if (configObj.get("CombatTPCooldownSec") != null) {
-            COMBAT_TP_COOLDOWN_SEC = configObj.get("CombatTPCooldownSec").getAsFloat();
+        if (configObj.get("CombatTpCooldownSec") != null) {
+            COMBAT_TP_COOLDOWN_SEC = configObj.get("CombatTpCooldownSec").getAsFloat();
             COMBAT_TP_COOLDOWN_SEC = Math.max(COMBAT_TP_COOLDOWN_SEC, 0.0F);
         }
         if (configObj.get("CombatNotchAppleCooldownSec") != null) {
