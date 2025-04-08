@@ -96,14 +96,14 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
 
     @Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
     private void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        if (nbt.contains(COMBAT_TAG_KEY)) {
-            combat = nbt.getBoolean(COMBAT_TAG_KEY);
+        if (nbt.getBoolean(COMBAT_TAG_KEY).isPresent()) {
+            combat = nbt.getBoolean(COMBAT_TAG_KEY).get();
         } else {
             combat = false;
         }
 
-        if (nbt.contains(COMBAT_TAG_TICKS_KEY)) {
-            ticksSinceCombat = nbt.getInt(COMBAT_TAG_TICKS_KEY);
+        if (nbt.getInt(COMBAT_TAG_TICKS_KEY).isPresent()) {
+            ticksSinceCombat = nbt.getInt(COMBAT_TAG_TICKS_KEY).get();
         } else {
             ticksSinceCombat = 0;
         }
