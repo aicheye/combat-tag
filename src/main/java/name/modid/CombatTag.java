@@ -102,8 +102,6 @@ public class CombatTag implements ModInitializer {
  			}
 		}
 
-		combatTag(player);
-
 		if (!attacker.equals(player)) {
 			combatTag(player);
 			combatTag(attacker);
