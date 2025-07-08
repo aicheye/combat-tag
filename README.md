@@ -17,8 +17,8 @@ _Ethically sourced and GMO-free!_ Consider downloading on [Modrinth](https://mod
   - Enchanted golden apple cooldown
     - By default, the cooldown only starts after eating the first enchanted golden apple
   - Elytras disabled while combat tagged
-  - Players currently combat tagged have a red username
-  - Combat bar to indicate how long until the player's combat tag expires
+  - Red username
+  - Bar to indicate how long until the player's combat tag expires
 - **Fully configurable**
 
 ### Note:
