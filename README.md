@@ -11,13 +11,14 @@ _Ethically sourced and GMO-free!_ Consider downloading on [Modrinth](https://mod
   - Reduced health to half a heart (can be configured to instantly kill)
   - Reduced absorption
   - Poison
-- TP cooldown (ender pearls and chorus fruit)
-  - By default, the cooldown starts as soon as the player enters combat
-- Enchanted golden apple cooldown
-  - By default, the cooldown only starts after eating the first enchanted golden apple
-- Elytras disabled while combat tagged
-- Players currently combat tagged have a red username
-- Combat bar to indicate how long until the player's combat tag expires
+- While combat tagged
+  - TP cooldown (ender pearls and chorus fruit)
+    - By default, the cooldown starts as soon as the player enters combat
+  - Enchanted golden apple cooldown
+    - By default, the cooldown only starts after eating the first enchanted golden apple
+  - Elytras disabled while combat tagged
+  - Players currently combat tagged have a red username
+  - Combat bar to indicate how long until the player's combat tag expires
 - **Fully configurable**
 
 ### Note:
