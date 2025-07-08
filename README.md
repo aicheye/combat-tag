@@ -50,7 +50,8 @@ Found in `./config/CombatTag.json`
 *Warning: disabling these options may allow players in combat to message each other or leave the combat team and lose their colour
 
 ## Requirements
-- Fabric loader 16.10 or later
+- Fabric loader 16.10 or later (1.21.4/5)
+- Fabric loader 16.14 or later (1.21.6/7)
 - Minecraft 1.21.4 or later
-  - May work with older versions (have to build yourself to test)
+  - May work with older versions (build yourself to test: see [here](https://fabricmc.net/develop/) for more)
 - Java 21 or later
