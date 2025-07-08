@@ -59,6 +59,12 @@ public class Config {
     }
 
     public static void write() throws IOException {
+        if (!CONFIG_PATH.getParent().toFile().exists()) {
+            if (!CONFIG_PATH.getParent().toFile().mkdirs()) {
+                throw new IOException("(could not create directory)");
+            }
+        }
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         BufferedWriter bw = new BufferedWriter(new FileWriter(CONFIG_PATH.toString()));
         JsonObject configObj = new JsonObject();
