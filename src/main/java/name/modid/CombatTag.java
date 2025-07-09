@@ -1,12 +1,15 @@
 package name.modid;
 
 import name.modid.access.ServerPlayerEntityAccess;
+import name.modid.events.PlayerAttackCallback;
 import name.modid.events.PlayerDamageCallback;
 import name.modid.events.PlayerDeathCallback;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -50,6 +53,7 @@ public class CombatTag implements ModInitializer {
 
         PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
 		PlayerDamageCallback.EVENT.register(CombatTag::onPlayerDamage);
+		PlayerAttackCallback.EVENT.register(CombatTag::onPlayerAttack);
 
 		if (Config.ENABLE_COMBAT_COLOUR) {
 			ServerTickEvents.END_SERVER_TICK.register(ScoreboardManager::tickScoreboard);
@@ -92,19 +96,39 @@ public class CombatTag implements ModInitializer {
 	}
 
 	private static void onPlayerDamage(ServerPlayerEntity player, DamageSource source) {
-		ServerPlayerEntity attacker = player;
+		ServerPlayerEntity attacker = null;
 
-		if (source.getAttacker() instanceof ServerPlayerEntity) {
-            attacker = (ServerPlayerEntity) source.getAttacker();
-		} else if (source.getAttacker() instanceof ProjectileEntity projectile) {
-			if (projectile.getOwner() instanceof ServerPlayerEntity) {
-				attacker = (ServerPlayerEntity) projectile.getOwner();
- 			}
+		if (source.getAttacker() instanceof ServerPlayerEntity serverPlayerEntity) {
+			attacker = serverPlayerEntity;
+		} else if (source.getAttacker() instanceof ProjectileEntity projectile &&
+				projectile.getOwner() instanceof ServerPlayerEntity serverPlayerEntity) {
+			attacker = serverPlayerEntity;
 		}
 
-		if (!attacker.equals(player)) {
+		if (attacker != null && !attacker.equals(player)) {
 			combatTag(player);
-			combatTag(attacker);
+			if (Config.ENABLE_TAG_ON_ATTACK) {
+				combatTag(attacker);
+			}
+			return;
+		}
+
+		// guard clause
+		if (!Config.ENABLE_PVE_TAG_ON_DAMAGE) {
+			return;
+		}
+
+		if (source.getAttacker() instanceof LivingEntity) {
+			combatTag(player);
+		} else if (source.getAttacker() instanceof ProjectileEntity projectile &&
+				projectile.getOwner() instanceof LivingEntity) {
+			combatTag(player);
+		}
+	}
+
+	private static void onPlayerAttack(ServerPlayerEntity player, Entity target) {
+		if (Config.ENABLE_PVE_TAG_ON_ATTACK && target instanceof LivingEntity && !player.equals(target)) {
+			combatTag(player);
 		}
 	}
 

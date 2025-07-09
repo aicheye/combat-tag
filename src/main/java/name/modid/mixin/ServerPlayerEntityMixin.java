@@ -4,9 +4,11 @@ import name.modid.CombatTag;
 import name.modid.Config;
 import name.modid.CombatCooldownManager;
 import name.modid.access.ServerPlayerEntityAccess;
+import name.modid.events.PlayerAttackCallback;
 import name.modid.events.PlayerDamageCallback;
 import name.modid.events.PlayerDeathCallback;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
@@ -78,6 +80,12 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     private void onDeath(DamageSource source, CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         PlayerDeathCallback.EVENT.invoker().onPlayerDeath(player, source);
+    }
+
+    @Inject(method = "attack", at = @At("RETURN"))
+    private void attack(Entity target, CallbackInfo ci) {
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+        PlayerAttackCallback.EVENT.invoker().onPlayerAttack(player, target);
     }
 
     @Inject(method = "consumeItem", at = @At("RETURN"))
