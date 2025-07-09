@@ -10,12 +10,11 @@ import name.modid.events.PlayerDeathCallback;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -97,15 +96,25 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         }
     }
 
-    @Inject(method = "writeCustomData", at = @At("RETURN"))
-    private void writeCustomData(WriteView view, CallbackInfo ci) {
-        view.putBoolean(COMBAT_TAG_KEY, combat);
-        view.putInt(COMBAT_TAG_TICKS_KEY, ticksSinceCombat);
+    @Inject(method = "writeCustomDataToNbt", at = @At("HEAD"))
+    private void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo ci) {
+        nbt.putBoolean(COMBAT_TAG_KEY, combat);
+        nbt.putInt(COMBAT_TAG_TICKS_KEY, ticksSinceCombat);
     }
 
-    @Inject(method = "readCustomData", at = @At("RETURN"))
-    private void readCustomData(ReadView view, CallbackInfo ci) {
-        combat = view.getBoolean(COMBAT_TAG_KEY, false);
-        ticksSinceCombat = view.getInt(COMBAT_TAG_TICKS_KEY, 0);
+    @Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
+    private void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
+        if (nbt.contains(COMBAT_TAG_KEY)) {
+            combat = nbt.getBoolean(COMBAT_TAG_KEY);
+        } else {
+            combat = false;
+        }
+
+        if (nbt.contains(COMBAT_TAG_TICKS_KEY)) {
+            ticksSinceCombat = nbt.getInt(COMBAT_TAG_TICKS_KEY);
+        } else {
+            ticksSinceCombat = 0;
+        }
     }
+}
 }
