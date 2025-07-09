@@ -29,7 +29,7 @@ public class CombatTag implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    @Override
+	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
@@ -41,7 +41,7 @@ public class CombatTag implements ModInitializer {
 			Config.load();
 			LOGGER.info("[{}] config loaded", MOD_ID);
 		} catch (IOException e1) {
-			LOGGER.info("[{}] could not load config", MOD_ID);
+			LOGGER.warn("[{}] could not load config", MOD_ID);
 			try {
 				LOGGER.info("[{}] generating new config file...", MOD_ID);
 				Config.write();
@@ -49,9 +49,9 @@ public class CombatTag implements ModInitializer {
 			} catch (IOException e2) {
 				LOGGER.error("[{}] could not write new config file {}", MOD_ID, e2.getMessage());
 			}
-        }
+		}
 
-        PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
+		PlayerDeathCallback.EVENT.register(CombatTag::onPlayerDeath);
 		PlayerDamageCallback.EVENT.register(CombatTag::onPlayerDamage);
 		PlayerAttackCallback.EVENT.register(CombatTag::onPlayerAttack);
 
@@ -64,6 +64,16 @@ public class CombatTag implements ModInitializer {
 	}
 
 	private static void combatTag(ServerPlayerEntity player) {
+		if (!player.isPartOfGame()) {
+			LOGGER.warn("[{}] combat tag called on player {} who is not part of the game", MOD_ID, player.getName().getString());
+			return;
+		}
+
+		if (player.isCreative()) {
+			LOGGER.warn("[{}] combat tag called on player {} who is in creative mode", MOD_ID, player.getName().getString());
+			return;
+		}
+
 		ServerPlayerEntityAccess combatAccessor = (ServerPlayerEntityAccess) player;
 
 		if (!combatAccessor.combat_tag$inCombat()) {
