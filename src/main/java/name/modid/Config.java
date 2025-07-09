@@ -21,6 +21,9 @@ public class Config {
     public static float ABSORPTION_REMAINING_PUNISH = 0;
     private static float POISON_DURATION_SEC = 20;
     private static int POISON_LEVEL = 5;
+    public static boolean ENABLE_TAG_ON_ATTACK = true;
+    public static boolean ENABLE_PVE_TAG_ON_DAMAGE = false;
+    public static boolean ENABLE_PVE_TAG_ON_ATTACK = false;
     public static boolean ENABLE_HEALTH_PUNISH = true;
     public static boolean ENABLE_ABSORPTION_PUNISH= true;
     public static boolean ENABLE_POISON_PUNISH = true;
@@ -76,6 +79,9 @@ public class Config {
         configObj.addProperty("AbsorptionRemainingPunish", ABSORPTION_REMAINING_PUNISH);
         configObj.addProperty("PoisonDurationSec", POISON_DURATION_SEC);
         configObj.addProperty("PoisonLevel", POISON_LEVEL);
+        configObj.addProperty("EnableTagOnAttack", ENABLE_TAG_ON_ATTACK);
+        configObj.addProperty("EnablePveTagOnDamage", ENABLE_PVE_TAG_ON_DAMAGE);
+        configObj.addProperty("EnablePveTagOnAttack", ENABLE_PVE_TAG_ON_ATTACK);
         configObj.addProperty("EnableHealthPunish", ENABLE_HEALTH_PUNISH);
         configObj.addProperty("EnableAbsorptionPunish", ENABLE_ABSORPTION_PUNISH);
         configObj.addProperty("EnablePoisonPunish", ENABLE_POISON_PUNISH);
@@ -124,6 +130,15 @@ public class Config {
         if (configObj.get("PoisonLevel") != null) {
             POISON_LEVEL = configObj.get("PoisonLevel").getAsInt();
             POISON_LEVEL = Math.max(POISON_LEVEL, 0);
+        }
+        if (configObj.get("EnableTagOnAttack") != null) {
+            ENABLE_TAG_ON_ATTACK = configObj.get("EnableTagOnAttack").getAsBoolean();
+        }
+        if (configObj.get("EnablePveTagOnDamage") != null) {
+            ENABLE_PVE_TAG_ON_DAMAGE = configObj.get("EnablePveTagOnDamage").getAsBoolean();
+        }
+        if (configObj.get("EnablePveTagOnAttack") != null) {
+            ENABLE_PVE_TAG_ON_ATTACK = configObj.get("EnablePveTagOnAttack").getAsBoolean();
         }
         if (configObj.get("EnableHealthPunish") != null) {
             ENABLE_HEALTH_PUNISH = configObj.get("EnableHealthPunish").getAsBoolean();
