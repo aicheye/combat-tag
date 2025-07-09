@@ -117,4 +117,3 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
         }
     }
 }
-}
