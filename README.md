@@ -7,6 +7,7 @@ _Ethically sourced and GMO-free!_ Consider downloading on [Modrinth](https://mod
 ![image](https://github.com/user-attachments/assets/30e4fe6e-58d0-4fb9-89a9-b41005c27fb0)
 
 ## Features:
+- Compatible with PvP and PvE
 - Combat disconnect punishing
   - Reduced health to half a heart (can be configured to instantly kill)
   - Reduced absorption
@@ -40,6 +41,9 @@ Found in `./config/CombatTag.json`
 |AbsorptionRemainingPunish|Float|0.0|How much absorption the player should have upon reconnecting while combat tagged|
 |PoisonDurationSec|Float|20.0|How long the player should be poisoned for upon reconnecting while combat tagged|
 |PoisonLevel|Integer|5|The amplification level of the poison effect upon reconnecting while combat tagged|
+|EnableTagOnAttack|Boolean|true|Whether the attacker should be tagged in PvP|
+|EnablePveTagOnDamage|Boolean|false|Whether the damaged player should be tagged in PvE|
+|EnablePveTagOnAttack|Boolean|false|Whether the attacking player should be tagged in PvE|
 |EnableHealthPunish|Boolean|true|Whether the player should lose health upon reconnecting while combat tagged|
 |EnableAbsorptionPunish|Boolean|true|Whether the player should lose absorption upon reconnecting while combat tagged|
 |EnablePoisonPunish|Boolean|true|Whether the player should be poisoned upon reconnecting while combat tagged|
