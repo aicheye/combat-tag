@@ -21,7 +21,7 @@ public class Config {
     public static float ABSORPTION_REMAINING_PUNISH = 0;
     private static float POISON_DURATION_SEC = 20;
     private static int POISON_LEVEL = 5;
-    public static boolean ONLY_TAG_WEAPONS = true;
+    public static boolean ONLY_TAG_WEAPONS = false;
     public static boolean ENABLE_TAG_ON_ATTACK = true;
     public static boolean ENABLE_PVE_TAG_ON_DAMAGE = false;
     public static boolean ENABLE_PVE_TAG_ON_ATTACK = false;
