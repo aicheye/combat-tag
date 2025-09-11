@@ -41,6 +41,7 @@ Found in `./config/CombatTag.json`
 |AbsorptionRemainingPunish|Float|0.0|How much absorption the player should have upon reconnecting while combat tagged|
 |PoisonDurationSec|Float|20.0|How long the player should be poisoned for upon reconnecting while combat tagged|
 |PoisonLevel|Integer|5|The amplification level of the poison effect upon reconnecting while combat tagged|
+|OnlyTagWeapons|Boolean|false|Whether combat tags should only apply when taking weapon/TNT/crystal damage (full list of weapons [here](https://github.com/aicheye/combat-tag/blob/master/src/main/java/name/modid/CombatTag.java#L40))|
 |EnableTagOnAttack|Boolean|true|Whether the attacker should be tagged in PvP|
 |EnablePveTagOnDamage|Boolean|false|Whether the damaged player should be tagged in PvE|
 |EnablePveTagOnAttack|Boolean|false|Whether the attacking player should be tagged in PvE|
