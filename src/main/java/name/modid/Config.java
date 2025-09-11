@@ -21,6 +21,7 @@ public class Config {
     public static float ABSORPTION_REMAINING_PUNISH = 0;
     private static float POISON_DURATION_SEC = 20;
     private static int POISON_LEVEL = 5;
+    public static boolean ONLY_TAG_WEAPONS = true;
     public static boolean ENABLE_TAG_ON_ATTACK = true;
     public static boolean ENABLE_PVE_TAG_ON_DAMAGE = false;
     public static boolean ENABLE_PVE_TAG_ON_ATTACK = false;
@@ -79,6 +80,7 @@ public class Config {
         configObj.addProperty("AbsorptionRemainingPunish", ABSORPTION_REMAINING_PUNISH);
         configObj.addProperty("PoisonDurationSec", POISON_DURATION_SEC);
         configObj.addProperty("PoisonLevel", POISON_LEVEL);
+        configObj.addProperty("OnlyTagWeapons", ONLY_TAG_WEAPONS);
         configObj.addProperty("EnableTagOnAttack", ENABLE_TAG_ON_ATTACK);
         configObj.addProperty("EnablePveTagOnDamage", ENABLE_PVE_TAG_ON_DAMAGE);
         configObj.addProperty("EnablePveTagOnAttack", ENABLE_PVE_TAG_ON_ATTACK);
@@ -130,6 +132,9 @@ public class Config {
         if (configObj.get("PoisonLevel") != null) {
             POISON_LEVEL = configObj.get("PoisonLevel").getAsInt();
             POISON_LEVEL = Math.max(POISON_LEVEL, 0);
+        }
+        if (configObj.get("OnlyTagWeapons") != null) {
+            ONLY_TAG_WEAPONS = configObj.get("OnlyTagWeapons").getAsBoolean();
         }
         if (configObj.get("EnableTagOnAttack") != null) {
             ENABLE_TAG_ON_ATTACK = configObj.get("EnableTagOnAttack").getAsBoolean();

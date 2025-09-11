@@ -11,15 +11,23 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageType;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 public class CombatTag implements ModInitializer {
 	public static final String MOD_ID = "combat-tag";
@@ -28,6 +36,25 @@ public class CombatTag implements ModInitializer {
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+	public static final Set<Item> weapons = Set.of(
+			Items.NETHERITE_SWORD,
+			Items.DIAMOND_SWORD,
+			Items.IRON_SWORD,
+			Items.GOLDEN_SWORD,
+			Items.STONE_SWORD,
+			Items.WOODEN_SWORD,
+			Items.NETHERITE_AXE,
+			Items.DIAMOND_AXE,
+			Items.IRON_AXE,
+			Items.GOLDEN_AXE,
+			Items.STONE_AXE,
+			Items.WOODEN_AXE,
+			Items.TRIDENT,
+			Items.MACE,
+			Items.BOW,
+			Items.CROSSBOW
+	);
 
     @Override
 	public void onInitialize() {
@@ -116,6 +143,28 @@ public class CombatTag implements ModInitializer {
 		}
 
 		if (attacker != null && !attacker.equals(player)) {
+			if (Config.ONLY_TAG_WEAPONS) {
+				try {
+					LOGGER.info("[{}] player damaged by weapon {}", MOD_ID, Objects.requireNonNull(source.getWeaponStack()).getItem().toString());
+					LOGGER.info("[{}] player damaged by damage type {}", MOD_ID, source.getType().toString());
+					if (!(weapons.contains(Objects.requireNonNull(source.getWeaponStack()).getItem()))) {
+						// check if damage type is explosion
+						Optional<RegistryKey<DamageType>> damageTypeKey = source.getTypeRegistryEntry().getKey();
+						if (damageTypeKey.isPresent() && !(damageTypeKey.get().equals(DamageTypes.PLAYER_EXPLOSION))) {
+							// exit early
+							return;
+						}
+					}
+				} catch (NullPointerException ignored) {
+					// check if damage type is explosion
+					Optional<RegistryKey<DamageType>> damageTypeKey = source.getTypeRegistryEntry().getKey();
+					if (damageTypeKey.isPresent() && !(damageTypeKey.get().equals(DamageTypes.PLAYER_EXPLOSION))) {
+						// exit early
+						return;
+					}
+				}
+			}
+
 			combatTag(player);
 			if (Config.ENABLE_TAG_ON_ATTACK) {
 				combatTag(attacker);
