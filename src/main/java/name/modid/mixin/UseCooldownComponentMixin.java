@@ -28,7 +28,7 @@ public class UseCooldownComponentMixin {
     public void set(ItemStack stack, LivingEntity user, CallbackInfo ci) {
         if (Config.ENABLE_TP_PUNISH) {
             if (user instanceof ServerPlayerEntity player && inCombat(player)) {
-                if (stack.getItem().equals(Items.ENDER_PEARL)) {
+                if (stack.getItem().equals(Items.ENDER_PEARL) || stack.getItem().equals(Items.CHORUS_FRUIT)) {
                     player.getItemCooldownManager().set(stack, Config.COMBAT_TP_COOLDOWN);
                 }
             }
