@@ -55,7 +55,7 @@ public abstract class ServerPlayerEntityMixin implements ServerPlayerEntityAcces
     @Inject(method = "onDisconnect", at = @At("HEAD"))
     public void onDisconnect(CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
-        MinecraftServer server = player.getServer();
+        MinecraftServer server = player.getEntityWorld().getServer();
         if (combat && server != null && !server.isStopping() && !server.isSaving() && !server.isPaused()) {
             CombatTag.logoutPunish(player);
         }
