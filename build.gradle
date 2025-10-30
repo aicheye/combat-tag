@@ -2,6 +2,7 @@
 plugins {
 	id 'fabric-loom' version '1.12.+'
 	id 'maven-publish'
+	id 'jacoco'
 }
 
 version = project.mod_version
@@ -40,6 +41,14 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	
+	// Testing dependencies
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	testImplementation 'org.mockito:mockito-core:5.5.0'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
+
+	// Fabric testing
+	testImplementation "net.fabricmc:fabric-loader-junit:${project.loader_version}"
 }
 
 processResources {
@@ -89,3 +98,55 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+// Test configuration
+test {
+	useJUnitPlatform()
+
+	testLogging {
+		events "passed", "skipped", "failed"
+		exceptionFormat "full"
+		showStandardStreams = false
+	}
+
+	finalizedBy jacocoTestReport
+}
+
+// JaCoCo configuration
+jacoco {
+	toolVersion = "0.8.10"
+}
+
+jacocoTestReport {
+	dependsOn test
+
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = true
+
+		html.outputLocation = layout.buildDirectory.dir('reports/jacoco/html')
+		xml.outputLocation = layout.buildDirectory.file('reports/jacoco/jacoco.xml')
+		csv.outputLocation = layout.buildDirectory.file('reports/jacoco/jacocoTestReport.csv')
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+				'**/mixin/**',
+				'**/access/**'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.5
+			}
+		}
+	}
+}
+
