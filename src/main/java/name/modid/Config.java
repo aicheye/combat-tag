@@ -5,11 +5,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 
+import com.google.gson.JsonArray;
+
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Config {
     private static final Path CONFIG_PATH = Path.of("./config/CombatTag.json");
@@ -36,6 +40,8 @@ public class Config {
     public static boolean ENABLE_COMBAT_COLOUR = true;
     public static boolean DISABLE_TEAM_MSG_COMMAND = true;
     public static boolean DISABLE_TEAM_COMMAND = true;
+    public static List<String> COMMAND_BLACKLIST = List.of("tpa", "tpaccept", "home", "spawn", "back", "warp");
+    public static String COMMAND_BLACKLIST_MESSAGE = "You cannot use this command while in combat!";
 
     public static int COMBAT_DURATION = Math.round(COMBAT_DURATION_SEC * 20);
     public static int COMBAT_TP_COOLDOWN = Math.round(COMBAT_TP_COOLDOWN_SEC * 20);
@@ -95,6 +101,12 @@ public class Config {
         configObj.addProperty("EnableCombatColour", ENABLE_COMBAT_COLOUR);
         configObj.addProperty("DisableTeamMsgCommand", DISABLE_TEAM_MSG_COMMAND);
         configObj.addProperty("DisableTeamCommand", DISABLE_TEAM_COMMAND);
+        JsonArray blacklistArray = new JsonArray();
+        for (String cmd : COMMAND_BLACKLIST) {
+            blacklistArray.add(cmd);
+        }
+        configObj.add("CommandBlacklist", blacklistArray);
+        configObj.addProperty("CommandBlacklistMessage", COMMAND_BLACKLIST_MESSAGE);
 
         gson.toJson(configObj, bw);
         bw.close();
@@ -177,6 +189,17 @@ public class Config {
         }
         if (configObj.get("DisableTeamCommand") != null) {
             DISABLE_TEAM_COMMAND = configObj.get("DisableTeamCommand").getAsBoolean();
+        }
+        if (configObj.get("CommandBlacklist") != null) {
+            JsonArray arr = configObj.getAsJsonArray("CommandBlacklist");
+            List<String> list = new ArrayList<>();
+            for (var element : arr) {
+                list.add(element.getAsString());
+            }
+            COMMAND_BLACKLIST = list;
+        }
+        if (configObj.get("CommandBlacklistMessage") != null) {
+            COMMAND_BLACKLIST_MESSAGE = configObj.get("CommandBlacklistMessage").getAsString();
         }
 
         jr.close();
