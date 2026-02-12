@@ -18,6 +18,7 @@ _Ethically sourced and GMO-free!_ Consider downloading on [Modrinth](https://mod
   - Enchanted golden apple cooldown
     - By default, the cooldown only starts after eating the first enchanted golden apple
   - Elytras disabled while combat tagged
+  - Command blacklist (e.g., /home, /spawn, /tpa)
   - Red username
   - Bar to indicate how long until the player's combat tag expires
 - **Fully configurable**
@@ -56,6 +57,8 @@ Found in `./config/CombatTag.json`
 |EnableCombatColour|Boolean|true|Whether players in combat should appear red (spectral arrows, scoreboard, username in chat, etc.)|
 |DisableTeamMsgCommand*|Boolean|true|Whether players should be allowed to use /teammsg|
 |DisableTeamCommand*|Boolean|true|Whether players should be allowed to use /team|
+|CommandBlacklist|String[]|["tpa", "tpaccept", "home", "spawn", "back", "warp"]|Commands that are blocked while in combat|
+|CommandBlacklistMessage|String|"You cannot use this command while in combat!"|Message shown when a blacklisted command is blocked|
 
 *Warning: disabling these options may allow players in combat to message each other or leave the combat team and lose their colour
 
